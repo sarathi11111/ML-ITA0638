@@ -1,0 +1,23 @@
+import csv
+
+def candidate_elimination(filename):
+    with open(filename, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        training_data = list(reader)
+
+    consistent_hypotheses = set([tuple(row) for row in training_data])
+
+    for i in range(len(training_data)):
+        for j in range(len(training_data[i])):
+                new_hypothesis = list(training_data[i])
+                new_hypothesis[j] = value
+
+                if all(new_hypothesis in consistent_hypotheses for consistent_hypothesis in consistent_hypotheses):
+                    # Add the new hypothesis to the set of consistent hypotheses
+                    consistent_hypotheses.add(tuple(new_hypothesis))
+
+    return consistent_hypotheses
+
+filename = 'my_training_data.csv'
+consistent_hypotheses = candidate_elimination(filename)
+print("Consistent Hypotheses:", consistent_hypotheses)
