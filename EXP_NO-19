@@ -1,0 +1,47 @@
+import numpy as np
+
+class NaiveBayes:
+    def __init__(self, classes):
+        self.classes = classes
+        self.prior_probabilities = None
+        self.conditional_probabilities = None
+
+    def fit(self, X, y):
+        # Calculate prior probabilities
+        self.prior_probabilities = np.zeros(len(self.classes))
+        for i, c in enumerate(self.classes):
+            self.prior_probabilities[i] = np.sum(y == c) / len(y)
+
+        # Calculate conditional probabilities
+        self.conditional_probabilities = {}
+        for c in self.classes:
+            X_c = X[y == c]
+            self.conditional_probabilities[c] = {}
+            for j in range(X.shape[1]):
+                self.conditional_probabilities[c][j] = {}
+                unique_values = np.unique(X_c[:, j])
+                for value in unique_values:
+                    self.conditional_probabilities[c][j][value] = np.sum(X_c[:, j] == value) / len(X_c)
+
+    def predict(self, X):
+        predictions = []
+        for x in X:
+            posteriors = {}
+            for c in self.classes:
+                posterior = np.log(self.prior_probabilities[c])
+                for j in range(len(x)):
+                    posterior += np.log(self.conditional_probabilities[c][j][x[j]])
+                posteriors[c] = posterior
+            predictions.append(max(posteriors, key=posteriors.get))
+        return predictions
+
+# Example usage
+X = np.array([[0, 1], [1, 0], [0, 1], [1, 1]])
+y = np.array([0, 1, 0, 1])
+classes = [0, 1]
+
+model = NaiveBayes(classes)
+model.fit(X, y)
+
+predictions = model.predict([[0, 0], [1, 1]])
+print("Predictions:", predictions)
