@@ -1,0 +1,35 @@
+def em_algorithm(X, k, iterations=100, tol=1e-4):
+    # Initialize parameters
+    r = np.full((X.shape[0], k), fill_value=1/k)
+    pi = np.full((k,), fill_value=1/k)
+    means = np.mean(X, axis=0)
+    covariances = np.array([np.cov(X.T)] * k)
+
+    for i in range(iterations):
+        # Expectation step
+        for j in range(k):
+            r[:, j] = pi[j] * multivariate_normal(X, means[j], covariances[j])
+
+        r /= np.sum(r, axis=1, keepdims=True)
+
+        # Maximization step
+        pi = np.sum(r, axis=0) / X.shape[0]
+        means = np.dot(r.T, X) / np.sum(r, axis=0)
+
+        for j in range(k):
+            X_centered = X - means[j]
+            covariances[j] = np.dot(X_centered.T, X_centered * r[:, j]) / np.sum(r[:, j])
+
+        # Check for convergence
+        if np.max(np.abs(r - np.roll(r, 1, axis=0))) < tol:
+            break
+
+    return means, covariances, pi
+
+# Example usage
+X = np.random.multivariate_normal([0, 0], [[1, 0.5], [0.5, 1]], size=100)
+
+means, covariances, pi = em_algorithm(X, k=2)
+print("Estimated means:", means)
+print("Estimated covariances:", covariances)
+print("Estimated mixing coefficients:", pi)
