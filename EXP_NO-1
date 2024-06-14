@@ -1,0 +1,24 @@
+import csv
+from collections import Counter
+
+def find_most_specific_hypothesis(filename):
+    with open(filename, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        training_data = list(reader)
+
+    hypothesis = training_data[0]
+    most_specific_hypothesis = None
+
+    for i in range(1, len(training_data)):
+        for j in range(len(training_data[i])):
+            if training_data[i][j] != hypothesis[j]:
+                hypothesis[j] = '?'
+
+        if Counter(hypothesis).most_common(1)[0][1] > Counter(most_specific_hypothesis).most_common(1)[0][1]:
+            most_specific_hypothesis = hypothesis.copy()
+
+    return most_specific_hypothesis
+
+filename = 'my_training_data.csv'
+most_specific_hypothesis = find_most_specific_hypothesis(filename)
+print("Most Specific Hypothesis:", most_specific_hypothesis)
