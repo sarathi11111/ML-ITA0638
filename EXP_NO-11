@@ -1,0 +1,35 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score
+
+# Load the dataset
+df = pd.read_csv('credit_score.csv')
+
+# Preprocess the data
+df['Gender'].fillna(df['Gender'].mode()[0], inplace=True)
+df['Married'].fillna(df['Married'].mode()[0], inplace=True)
+df['Dependents'].fillna(df['Dependents'].mode()[0], inplace=True)
+df['Self_Employed'].fillna(df['Self_Employed'].mode()[0], inplace=True)
+df['LoanAmount'].fillna(df['LoanAmount'].mean(), inplace=True)
+df['Loan_Amount_Term'].fillna(df['Loan_Amount_Term'].mean(), inplace=True)
+df['Credit_History'].fillna(df['Credit_History'].mode()[0], inplace=True)
+
+# Convert categorical variables to numerical using one-hot encoding
+df = pd.get_dummies(df, drop_first=True)
+
+# Split the data into training and testing sets
+X = df.drop('Loan_Status', axis=1)
+y = df['Loan_Status']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
+
+# Train the Naive Bayes classifier
+classifier = GaussianNB()
+classifier.fit(X_train, y_train)
+
+# Predict loan status for the test set
+y_pred = classifier.predict(X_test)
+
+# Evaluate the accuracy of the model
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
