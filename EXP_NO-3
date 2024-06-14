@@ -1,0 +1,67 @@
+import math
+
+def entropy(data):
+    labels = [row[-1] for row in data]
+    unique_labels = set(labels)
+    entropy = 0.0
+    for label in unique_labels:
+        p = labels.count(label) / len(labels)
+        if p > 0:
+            entropy -= p * math.log2(p)
+    return entropy
+
+def gain(data, attribute):
+    values = set([row[attribute] for row in data])
+    gain = entropy(data)
+    for value in values:
+        subdata = [row for row in data if row[attribute] == value]
+        gain -= len(subdata) / len(data) * entropy(subdata)
+    return gain
+
+def decision_tree(data, attributes):
+    if len(data) == 0:
+        return None
+    if len(set([row[-1] for row in data])) == 1:
+        return data[0][-1]
+
+    best_attribute = attributes[0]
+    for attribute in attributes:
+        if gain(data, attribute) > gain(data, best_attribute):
+            best_attribute = attribute
+
+    tree = {best_attribute: {}}
+    for value in set([row[best_attribute] for row in data]):
+        subdata = [row for row in data if row[best_attribute] == value]
+        subattributes = attributes.copy()
+        subattributes.remove(best_attribute)
+        subtree = decision_tree(subdata, subattributes)
+        tree[best_attribute][value] = subtree
+
+    return tree
+
+def classify(tree, sample):
+    attribute = list(tree.keys())[0]
+    value = sample[attribute]
+    if value in tree[attribute]:
+        subtree = tree[attribute][value]
+        if isinstance(subtree, dict):
+            return classify(subtree, sample)
+        else:
+            return subtree
+    else:
+        return None
+
+# Example usage
+data = [['Sunny', 'Warm', 'High', 'Strong', 'Yes', 'No'],
+       ['Sunny', 'Warm', 'High', 'Weak', 'Yes', 'No'],
+       ['Overcast', 'Warm', 'High', 'Strong', 'Yes', 'Yes'],
+       ['Rainy', 'Warm', 'High', 'Strong', 'No', 'Yes'],
+       ['Rainy', 'Cool', 'Normal', 'Weak', 'Yes', 'No']]
+attributes = ['Sunny', 'Warm', 'High', 'Strong', 'Yes']
+
+tree = decision_tree(data, attributes)
+print("Decision Tree:", tree)
+
+sample = ['Sunny', 'Cool', 'High', 'Strong', 'No']
+predicted_label = classify(tree, sample)
+print("Predicted Label:", predicted_label)
