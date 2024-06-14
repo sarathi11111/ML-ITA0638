@@ -1,0 +1,23 @@
+def linear_regression(X, y, iterations=1000, alpha=0.001):
+    # Initialize theta
+    theta = np.zeros(X.shape[1])
+
+    # Gradient descent loop
+    for i in range(iterations):
+        # Calculate predictions
+        predictions = X @ theta
+
+        # Calculate errors
+        errors = np.subtract(predictions, y)
+
+        # Update theta
+        theta = theta - alpha * (1/len(X)) * X.T @ errors
+
+    return theta
+
+# Example usage
+X = np.array([[1, 2], [3, 4], [5, 6]])
+y = np.array([2, 4, 6])
+
+theta = linear_regression(X, y)
+print("Estimated coefficients:", theta)
