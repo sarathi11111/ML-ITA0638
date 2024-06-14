@@ -1,0 +1,20 @@
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+
+# Load the data
+df = pd.read_csv('future_sales.csv')
+
+# Select features for scaling
+features_to_scale = ['TV', 'Radio', 'Newspaper']
+
+# Create a MinMaxScaler object
+scaler = MinMaxScaler()
+
+# Fit the scaler to the data
+scaler.fit(df[features_to_scale])
+
+# Transform the features
+df[features_to_scale] = scaler.transform(df[features_to_scale])
+
+# Print the transformed data
+print(df.head())
