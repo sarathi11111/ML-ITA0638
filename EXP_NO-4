@@ -1,0 +1,59 @@
+import numpy as np
+
+class NeuralNetwork:
+    def __init__(self, input_size, hidden_size, output_size, learning_rate=0.1):
+        self.model = {}
+
+        # Initialize weights
+        self.model["W1"] = np.random.randn(input_size, hidden_size)
+        self.model["b1"] = np.zeros((1, hidden_size))
+        self.model["W2"] = np.random.randn(hidden_size, output_size)
+        self.model["b2"] = np.zeros((1, output_size))
+
+        self.learning_rate = learning_rate
+
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
+
+    def forward(self, x):
+        z1 = np.dot(x, self.model["W1"]) + self.model["b1"]
+        a1 = self.sigmoid(z1)
+        z2 = np.dot(a1, self.model["W2"]) + self.model["b2"]
+        y_ = self.sigmoid(z2)
+        return y_
+
+    def backward(self, x, y):
+        a1, y_ = self.forward(x), self.forward(y)
+
+        # Calculate gradients
+        delta2 = y_ - y
+        dw2 = np.dot(a1.T, delta2)
+        db2 = np.sum(delta2, axis=0)
+        delta1 = np.dot(delta2, self.model["W2"].T) * (1 - np.power(a1, 2))
+        dw1 = np.dot(x.T, delta1)
+        db1 = np.sum(delta1, axis=0)
+
+        # Update weights
+        self.model["W1"] -= self.learning_rate * dw1
+        self.model["b1"] -= self.learning_rate * db1
+        self.model["W2"] -= self.learning_rate * dw2
+        self.model["b2"] -= self.learning_rate * db2
+
+    def train(self, x, y, epochs=100):
+        for epoch in range(epochs):
+            for i in range(len(x)):
+                self.backward(x[i], y[i])
+
+    def predict(self, x):
+        y_ = self.forward(x)
+        return np.argmax(y_, axis=1)
+
+# Example usage
+data = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+labels = np.array([[0], [1], [1], [0]])
+
+network = NeuralNetwork(input_size=2, hidden_size=2, output_size=1)
+network.train(data, labels)
+
+predictions = network.predict(data)
+print("Predictions:", predictions)
