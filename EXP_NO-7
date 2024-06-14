@@ -1,0 +1,29 @@
+import numpy as np
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def gradient_descent(X, y, theta, alpha, iterations):
+    cost_history = []
+
+    for i in range(iterations):
+        predictions = sigmoid(X @ theta)
+        errors = np.subtract(predictions, y)
+        theta = theta - alpha * (1/len(X)) * X.T @ errors
+        cost_history.append(cost(X, y, theta))
+
+    return theta, cost_history
+
+def cost(X, y, theta):
+    predictions = sigmoid(X @ theta)
+    return -np.sum(y * np.log(predictions) + (1 - y) * np.log(1 - predictions))
+
+# Example usage
+X = np.array([[1, 2], [3, 4], [5, 6]])
+y = np.array([0, 1, 1])
+theta = np.zeros(X.shape[1])
+alpha = 0.1
+iterations = 1000
+
+theta, cost_history = gradient_descent(X, y, theta, alpha, iterations)
+print("Final theta:", theta)
