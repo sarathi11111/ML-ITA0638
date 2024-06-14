@@ -1,0 +1,21 @@
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import confusion_matrix, accuracy_score
+
+# Prepare some data
+data = [[0, 1, 0], [0, 1, 1], [1, 0, 0], [1, 1, 1]]
+labels = [0, 1, 0, 1]
+
+# Train the Naive Bayes classifier
+model = GaussianNB().fit(data, labels)
+
+# Predict labels for new data
+new_data = [[0, 0, 1], [1, 0, 1]]
+predicted_labels = model.predict(new_data)
+
+# Calculate confusion matrix and accuracy
+confusion_matrix = confusion_matrix(labels, predicted_labels)
+accuracy = accuracy_score(labels, predicted_labels)
+
+# Print the results
+print("Confusion Matrix:\n", confusion_matrix)
+print("Accuracy:", accuracy)
